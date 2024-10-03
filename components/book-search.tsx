@@ -1,12 +1,12 @@
 "use client"
-import { useEffect, useState, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { Category, Prisma } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation"
-import { useDebounce } from 'use-debounce';
+import { useDebouncedCallback } from 'use-debounce';
 import CardBook from "./CardBook"
 
 // Mock data for books and categories
@@ -30,17 +30,18 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
   const prev_page = searchParams.get('prev_page');
   const category = searchParams.get('category');
   const query = searchParams.get('query');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("")
-  const value = useDebounce(searchTerm, 1000);
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name)
-
-  useEffect(
-    () => {
-      if (value[1].isPending())
-        router.push(`/?page=${1}&limit=${per_page}&query=${value[0].trim() || ""}`, { scroll: false })
+  const debounced = useDebouncedCallback(
+    // function
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_val) => {
+      router.push(`/?page=${1}&limit=${per_page}&query=${searchTerm.trim() || ""}`, { scroll: false })
     },
-    [per_page, router, value]
+    // delay in ms
+    1000
   );
 
   return (
@@ -50,7 +51,7 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
       <Tabs defaultValue="search" className="mb-6">
         <TabsList>
           <TabsTrigger onClick={() => {
-            router.push(`/?page=${prev_page}&limit=${per_page}`, { scroll: false })
+            router.push(`/?page=${prev_page || 1}&limit=${per_page}`, { scroll: false })
           }} value="search">Carca libro</TabsTrigger>
           <TabsTrigger onClick={() => {
             router.push(`/?page=${1}&limit=${per_page}&prev_page=${page}&category=${categories[0].name}`, { scroll: false })
@@ -62,7 +63,10 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
               type="text"
               placeholder="Search by title or author"
               value={searchTerm}
-              onChange={(e) => startTransition(() => setSearchTerm(e.target.value))}
+              onChange={(e) => startTransition(() => {
+                setSearchTerm(e.target.value);
+                debounced(e.target.value);
+              })}
               className="flex-grow"
             />
             <Button onClick={() => {
