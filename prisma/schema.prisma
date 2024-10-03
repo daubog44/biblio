@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+ 
+datasource db {
+  provider = "postgresql"
+  // Uses connection pooling
+  url = env("POSTGRES_PRISMA_URL")
+  // Uses direct connection, ⚠️ make sure to keep this to `POSTGRES_URL_NON_POOLING`
+  // or you'll have dangling databases from migrations
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  books Book[]
+
+  @@map("categories")
+  @@index(fields: [name], name: "cat_index")
+}
+
+model Book {
+  id                Int      @id @default(autoincrement())
+  categoryId        Int
+  category          Category @relation(fields: [categoryId], references: [id])
+  autore            String?
+  titolo            String?
+  casaEditrice      String?
+  annoPubblicazione String?
+  note              String?
+  scompartoCase     String?
+  inPrestito        Boolean @default(false)
+  dettagliPrestito  String?
+  image             String?
+
+  @@map("books")
+  @@index(fields: [titolo, autore], name: "main_index")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  number    String?
+  role      Roles
+  createdAt DateTime @default(now())
+  @@map("users")
+}
+
+enum Roles {
+  ADMIN
+  VIEWER
+}
+
