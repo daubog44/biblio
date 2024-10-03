@@ -7,9 +7,12 @@
     "build": "next build",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
-    "seed": "tsx prisma/seed.ts",
+    "seed": "node prisma/seed.js",
     "lint": "next lint",
     "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",

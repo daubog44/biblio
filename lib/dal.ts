@@ -40,7 +40,6 @@ export const getUser = cache(async () => {
     });
 
     return user;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("Failed to fetch user");
     return null;

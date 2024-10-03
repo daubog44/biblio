@@ -30,13 +30,11 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
   const prev_page = searchParams.get('prev_page');
   const category = searchParams.get('category');
   const query = searchParams.get('query');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name)
   const debounced = useDebouncedCallback(
     // function
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_val) => {
       router.push(`/?page=${1}&limit=${per_page}&query=${searchTerm.trim() || ""}`, { scroll: false })
     },
