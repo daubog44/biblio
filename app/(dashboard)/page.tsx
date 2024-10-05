@@ -1,8 +1,9 @@
 
 import { BookSearchComponent } from '@/components/book-search';
-import { booksGet, booksGetByCat } from '@/lib/callDB';
-import { verifySession } from '@/lib/dal'
+import { booksGet, booksGetByCat, getAllCategories } from '@/lib/callDB';
+import { getUser } from '@/lib/dal'
 import prisma from '@/lib/utils';
+import { cookies } from 'next/headers';
 import { redirect } from "next/navigation";
 
 export default async function Home({
@@ -10,16 +11,19 @@ export default async function Home({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const session = await verifySession();
+  const session = await getUser()
 
-  const userRole = (session)?.role // Assuming 'role' is part of the session object
+  if (!session) {
+    return redirect("/login")
+  }
+
   const page = searchParams['page'] ?? '1'
   const per_page = searchParams['limit'] ?? '8'
   const category = searchParams['category'];
   const query = searchParams['query'];
   const start = (Number(page) - 1) * Number(per_page) // 0, 5, 10 ...
   const end = start + Number(per_page) // 5, 10, 15 ...
-  const categories = await prisma.category.findMany({});
+  const categories = await getAllCategories();
   let books, count;
 
   //if (query?.length === 4 && Number(query))
@@ -50,9 +54,5 @@ export default async function Home({
   else
     [books, count] = await booksGet(start, Number(per_page))
 
-  if (userRole) {
-    return <BookSearchComponent count={count} categories={categories} books={books} totalPages={Math.ceil(count / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < count} />
-  } else {
-    redirect('/login')
-  }
+  return <BookSearchComponent count={count} categories={categories} books={books} totalPages={Math.ceil(count / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < count} />
 }

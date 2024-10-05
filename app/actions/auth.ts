@@ -4,7 +4,13 @@ import { FormState, SigninFormSchema } from "@/lib/definitions";
 import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
 import prisma from "@/lib/utils";
-import { verifySession } from "@/lib/dal";
+import { getUser, verifySession } from "@/lib/dal";
+
+export async function getUserM() {
+  const user = await getUser();
+  const d = { user };
+  return d;
+}
 
 export async function logout() {
   deleteSession();

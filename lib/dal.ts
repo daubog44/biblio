@@ -6,7 +6,8 @@ import prisma from "./utils";
 
 export const verifySession = cache(async (withredirect = true) => {
   const cookie = cookies().get("session")?.value;
-  const session = await decrypt(cookie);
+
+  const session = (await decrypt(cookie)) as { userId: number; role: string };
 
   if (!session?.userId) {
     if (withredirect) redirect("/login");
@@ -15,7 +16,6 @@ export const verifySession = cache(async (withredirect = true) => {
   return {
     role: session.role as "ADMIN" | "VIEWER",
     userId: session.userId as number,
-    expiresAt: session.exp as number,
   };
 });
 
@@ -34,8 +34,6 @@ export const getUser = cache(async () => {
         name: true,
         email: true,
         role: true,
-        number: true,
-        password: true,
       },
     });
 

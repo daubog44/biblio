@@ -9,7 +9,6 @@ export async function deleteSession() {
 }
 
 export async function createSession(userId: number, role: string) {
-  const expiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000);
   const session = await encrypt({
     userId,
     role,
@@ -18,7 +17,6 @@ export async function createSession(userId: number, role: string) {
   cookies().set("session", session, {
     httpOnly: true,
     secure: true,
-    expires: expiresAt,
     sameSite: "lax",
     path: "/",
   });
@@ -40,6 +38,6 @@ export async function decrypt(session: string | undefined = "") {
     });
     return payload;
   } catch (error) {
-    console.log("Failed to verify session");
+    console.error("Failed to verify session", (error as Error).message);
   }
 }

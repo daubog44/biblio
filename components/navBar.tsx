@@ -1,13 +1,17 @@
-"use server";
-import { verifySession } from "@/lib/dal";
+import { getUser } from "@/lib/dal";
 import NavBarClient from "./NbarClientPart";
+import { redirect } from "next/navigation";
 
 export async function NavBar({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const session = await verifySession();
+    const session = await getUser();
+    if (!session) {
+
+        return redirect("/login")
+    }
 
     return (
         <div className="min-h-screen bg-background text-foreground">

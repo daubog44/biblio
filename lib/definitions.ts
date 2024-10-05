@@ -5,9 +5,8 @@ export interface SessionPayload {
 
 import { z } from "zod";
 
-export const SignupFormSchema = z.object({
-  name: z.string().max(20),
-  email: z.string().email({ message: "Please enter a valid email." }).trim(),
+export const userModifier = z.object({
+  email: z.string().email({ message: "l'email non è valida" }).trim(),
   password: z
     .string()
     .min(8, { message: "la password deve avere almeno 8 caratteri." })

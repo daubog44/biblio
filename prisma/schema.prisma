@@ -17,7 +17,6 @@ model Category {
   books Book[]
 
   @@map("categories")
-  @@index(fields: [name], name: "cat_index")
 }
 
 model Book {
@@ -25,7 +24,7 @@ model Book {
   categoryId        Int
   category          Category @relation(fields: [categoryId], references: [id])
   autore            String?
-  titolo            String?
+  titolo            String
   casaEditrice      String?
   annoPubblicazione String?
   note              String?
@@ -44,9 +43,11 @@ model User {
   password  String
   name      String?
   number    String?
-  role      Roles
+  role      Roles    @default(VIEWER)
   createdAt DateTime @default(now())
   @@map("users")
+  @@index(fields: [email, name], name: "user_index")
+
 }
 
 enum Roles {

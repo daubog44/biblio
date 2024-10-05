@@ -13,7 +13,7 @@ export default function NavBarClient({ role }: { role: "ADMIN" | "VIEWER" }) {
             <Logout />
             <ModeToggle />
             {role === "ADMIN" && path === "/" && <AdminBtn />}
-            {role === "ADMIN" && path === "/admin" && <HomeBtn />}
+            {role === "ADMIN" && path.startsWith("/admin") && <HomeBtn />}
         </div>
     )
 }

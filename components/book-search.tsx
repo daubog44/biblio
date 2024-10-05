@@ -8,6 +8,7 @@ import { Category, Prisma } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation"
 import { useDebouncedCallback } from 'use-debounce';
 import CardBook from "./CardBook"
+import Pagination from "./Pagination"
 
 // Mock data for books and categories
 /*
@@ -30,7 +31,6 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
   const prev_page = searchParams.get('prev_page');
   const category = searchParams.get('category');
   const query = searchParams.get('query');
-  const [_, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name)
   const debounced = useDebouncedCallback(
@@ -41,6 +41,16 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
     // delay in ms
     1000
   );
+
+  const handlePrev = () => {
+    router.push(`/?page=${Number(page) - 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+      }`, { scroll: false })
+  }
+
+  const handleNext = () => {
+    router.push(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+      }`, { scroll: false })
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -61,10 +71,10 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
               type="text"
               placeholder="Search by title or author"
               value={searchTerm}
-              onChange={(e) => startTransition(() => {
+              onChange={(e) => {
                 setSearchTerm(e.target.value);
                 debounced(e.target.value);
-              })}
+              }}
               className="flex-grow"
             />
             <Button onClick={() => {
@@ -82,9 +92,7 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
                 variant={selectedCategory === category.name ? "default" : "outline"}
                 onClick={() => {
                   router.push(`/?page=${1}&limit=${per_page}&category=${category.name || ""}&prev_page=${prev_page || ""}`, { scroll: false })
-                  startTransition(() => {
-                    setSelectedCategory(category.name);
-                  })
+                  setSelectedCategory(category.name);
                 }}
               >
                 {category.name}
@@ -105,31 +113,7 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
       )}
 
       {count > 0 && (
-        <div className="flex justify-center items-center space-x-2 mt-6">
-          <Button
-            variant="outline"
-            disabled={!hasPrevPage}
-            onClick={() => {
-              router.push(`/?page=${Number(page) - 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
-                }`, { scroll: false })
-            }}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">
-            Page {Number(page)} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            onClick={() => {
-              router.push(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
-                }`, { scroll: false })
-            }}
-            disabled={!hasNextPage}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <Pagination hasNextPage={hasNextPage} page={Number(page)} totalPages={totalPages} hasPrevPage={hasPrevPage} handelPrev={handlePrev} handleNext={handleNext} />
       )}
     </div>
   )
