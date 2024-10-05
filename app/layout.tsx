@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
@@ -30,6 +31,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <SpeedInsights />
+          <Analytics />
         </ThemeProvider>
         <Toaster />
       </body>

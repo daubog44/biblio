@@ -10,15 +10,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useFormStatus } from "react-dom"
 import { useState } from "react"
 import { addUser } from "@/app/actions/restDB"
-import { Alert, AlertDescription } from "./ui/alert"
+import { Alert, AlertDescription } from "../ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { EyeOff, Eye } from "lucide-react";
 
-export function DialogAddUser() {
+export function DialogAddUser({ btnClasses }: { btnClasses?: string }) {
     const [showPassword, setShowPassword] = useState(false)
     const { toast } = useToast();
     const [state, setState] = useState({} as { [key: string]: string | number });
@@ -26,11 +26,11 @@ export function DialogAddUser() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className=" mt-4">Aggiungi utente</Button>
+                <Button className={btnClasses}>Aggiungi utente</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Aggiung</DialogTitle>
+                    <DialogTitle>Aggiungi</DialogTitle>
                 </DialogHeader>
                 <form>
                     <div className="grid gap-4 py-4">
@@ -114,11 +114,6 @@ export function DialogAddUser() {
                         }} type="submit">Salva modifiche</Button>
                     </DialogFooter>
                 </form>
-                {state?.error && (
-                    <Alert variant="destructive">
-                        <AlertDescription>{state.error}</AlertDescription>
-                    </Alert>
-                )}
             </DialogContent>
         </Dialog>
     )

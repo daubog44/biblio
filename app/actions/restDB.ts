@@ -1,11 +1,13 @@
 "use server";
 
-import { verifySession } from "@/lib/dal";
-import { userModifier } from "@/lib/definitions";
-import prisma from "@/lib/utils";
+import { BlobNotFoundError, del, head, put } from "@vercel/blob";
+import { verifySession } from "@/app/lib/dal";
+import { userModifier } from "@/app/lib/definitions";
+import prisma from "@/app/lib/utils";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcrypt";
-import { User } from "@prisma/client";
+import { Book } from "@prisma/client";
+import _ from "lodash";
 
 export async function postLoan(data: any) {
   const verify = await verifySession(false);
@@ -120,19 +122,36 @@ export async function modifyUser(formData: any) {
     newPassword = await bcrypt.hash(validatedFields.data.password, 11);
   }
 
+  if (formData.email) {
+    const validatedFields = userModifier.safeParse({
+      email: formData.email,
+    });
+
+    if (!validatedFields.success) {
+      return {
+        error:
+          validatedFields.error.flatten().fieldErrors.email?.length &&
+          (validatedFields.error.flatten().fieldErrors.email as string[])
+            .length > 0
+            ? (validatedFields.error.flatten().fieldErrors.email as string[])[0]
+            : "error",
+      };
+    }
+  }
+
   if (
     "password" in formData ||
     "number" in formData ||
-    "email" in formData ||
+    formData.email ||
     "name" in formData ||
-    "role" in formData
+    formData.role
   ) {
     const res = await prisma.user.update({
       where: { id: user.id },
       data: {
         ...("password" in formData && { password: newPassword }),
         ...("number" in formData && { number: formData.number }),
-        ...("email" in formData && { email: formData.email }),
+        ...(formData.email && { email: formData.email }),
         ...("name" in formData && { name: formData.name }),
         ...(formData.role && {
           role: formData.role,
@@ -227,5 +246,276 @@ export async function deleteUser(id: number) {
 
   revalidatePath("/admin");
 
+  return { msg: "success" };
+}
+
+const MB = 1_048_576;
+export async function modifyBook(data: Book, form: FormData) {
+  const verify = await verifySession(false);
+  if (!verify || verify.role !== "ADMIN")
+    return { error: "Errore: non sei autorizzato" };
+
+  if (!data || !data.id) {
+    return { error: "Mancano i dati." };
+  }
+  const book = await prisma.book.findUnique({ where: { id: data.id } });
+  if (!book) {
+    return { error: "Il libro da modificare non esiste." };
+  }
+  if (
+    book?.categoryId === data.categoryId ||
+    (_.isEqual(data, _.pick(book, Object.keys(data))) && !form.has("file"))
+  )
+    return { error: "Nulla da modificare." };
+  if (data.categoryId) {
+    const cat = await prisma.category.findUnique({
+      where: { id: data.categoryId },
+    });
+    if (!cat) {
+      return { error: "La categoria non esiste." };
+    }
+  }
+
+  let blob;
+  try {
+    if (form.has("file")) {
+      const file = form.get("file") as File;
+      if (file.size / MB > 1) {
+        return { error: "Errore: l'immagine è troppo grande." };
+      }
+      if (!form.get("fileType")!.toString().startsWith("image/")) {
+        return { error: "Errore: l'immagine non è adatta." };
+      }
+      const bytes = await file.arrayBuffer();
+      blob = await put("imagesbiblio/" + file.name.trim(), bytes, {
+        access: "public",
+      });
+      if (!blob) {
+        return { error: "Errore dal server, l'mmagine non è adatta." };
+      }
+    }
+  } catch (err) {
+    return { error: "Errore: " + (err as Error).message };
+  }
+
+  if (
+    data.titolo ||
+    data.categoryId ||
+    blob ||
+    "autore" in data ||
+    "casaEditrice" in data ||
+    "annoPubblicazione" in data ||
+    "scompartoCase" in data ||
+    "note" in data
+  ) {
+    const res = await prisma.book.update({
+      where: { id: data.id },
+      data: {
+        ...(blob && { image: blob.url }),
+        ...("autore" in data && { autore: data.autore }),
+        ...("casaEditrice" in data && { casaEditrice: data.casaEditrice }),
+        ...(data.titolo && { titolo: data.titolo }),
+        ...("annoPubblicazione" in data && {
+          annoPubblicazione: data.annoPubblicazione,
+        }),
+        ...("scompartoCase" in data && { scompartoCase: data.scompartoCase }),
+        ...("note" in data && { note: data.note }),
+        ...(data.categoryId && {
+          category: { connect: { id: data.categoryId } },
+        }),
+      },
+    });
+
+    if (!res.id) {
+      return { error: "Errore dal server." };
+    }
+  } else {
+    return { error: "Nulla da modificare." };
+  }
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { msg: "success" };
+}
+
+export async function deleteBook(id: number) {
+  const verify = await verifySession(false);
+  if (!verify || verify.role !== "ADMIN")
+    return { error: "Errore: non sei autorizzato" };
+
+  if (!id || !(id > 0)) {
+    return { error: "Mancano i dati." };
+  }
+  const book = await prisma.book.findUnique({ where: { id: id } });
+  if (!book) {
+    return { error: "Errore: il libro non esiste." };
+  }
+  if (book.image) {
+    try {
+      const headB = await head(book.image);
+      await del(headB.url);
+    } catch (err) {
+      if (err instanceof BlobNotFoundError) {
+        return { error: (err as BlobNotFoundError).message };
+      } else return { error: "Errore dal server." };
+    }
+  }
+
+  const res = await prisma.book.delete({ where: { id } });
+  if (!res.id) {
+    return { error: "Nulla da modificare." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { msg: "success" };
+}
+
+export async function addBook(data: Book, form: FormData) {
+  const verify = await verifySession(false);
+
+  if (!verify || verify.role !== "ADMIN")
+    return { error: "Errore: non sei autorizzato" };
+
+  if (!data || !data.titolo || !data.categoryId) {
+    return { error: "Errore: i dati non sono corretti." };
+  }
+
+  const cat = await prisma.category.findUnique({
+    where: { id: data.categoryId },
+  });
+  if (!cat) {
+    return { error: "la categoria non esiste." };
+  }
+
+  let blob;
+  try {
+    if (form.has("file")) {
+      const file = form.get("file") as File;
+      if (file.size / MB > 1) {
+        return { error: "Errore: l'immagine è troppo grande." };
+      }
+      if (!form.get("fileType")!.toString().startsWith("image/")) {
+        return { error: "Errore: l'immagine non è adatta." };
+      }
+      const bytes = await file.arrayBuffer();
+      blob = await put("imagesbiblio/" + file.name.trim(), bytes, {
+        access: "public",
+      });
+      if (!blob) {
+        return { error: "Errore dal server, l'mmagine non è adatta." };
+      }
+    }
+  } catch (err) {
+    return { error: "Errore: " + (err as Error).message };
+  }
+
+  try {
+    const res = await prisma.book.create({
+      data: {
+        titolo: data.titolo,
+        category: {
+          connect: { id: data.categoryId },
+        },
+        ...(data.autore && { autore: data.autore }),
+        ...(data.annoPubblicazione && {
+          annoPubblicazione: data.annoPubblicazione,
+        }),
+        ...(data.casaEditrice && {
+          casaEditrice: data.casaEditrice,
+        }),
+        ...(blob && {
+          image: blob.url,
+        }),
+        ...(data.scompartoCase && {
+          scompartoCase: data.scompartoCase,
+        }),
+        ...(data.note && {
+          note: data.note,
+        }),
+      },
+    });
+
+    if (!res.id) {
+      return { error: "Errore dal server." };
+    }
+  } catch (err) {
+    return { error: "Nulla da modificare." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { msg: "success" };
+}
+
+export async function addCategory(name: string) {
+  const verify = await verifySession(false);
+
+  if (!verify || verify.role !== "ADMIN")
+    return { error: "Errore: non sei autorizzato" };
+
+  if (!name) {
+    return { error: "Errore: i dati non sono corretti." };
+  }
+
+  try {
+    await prisma.category.create({ data: { name } });
+  } catch (err) {
+    return { error: "Errore: dal server" };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { msg: "success" };
+}
+
+export async function deleteCat(id: number, replaBooksTo?: number) {
+  const verify = await verifySession(false);
+
+  if (!verify || verify.role !== "ADMIN")
+    return { error: "Errore: non sei autorizzato" };
+
+  if (!id) {
+    return { error: "Errore: i dati non sono corretti." };
+  }
+
+  try {
+    console.log(id);
+    if (replaBooksTo) {
+      await prisma.book.updateMany({
+        where: { categoryId: id },
+        data: {
+          categoryId: replaBooksTo,
+        },
+      });
+    }
+    await prisma.category.delete({ where: { id } });
+  } catch (err) {
+    console.log(err);
+    return { error: "Errore dal server" };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { msg: "success" };
+}
+
+export async function modifyCat(id: number, name: string) {
+  const verify = await verifySession(false);
+
+  if (!verify || verify.role !== "ADMIN")
+    return { error: "Errore: non sei autorizzato" };
+
+  if (!id || !name) {
+    return { error: "Errore: i dati non sono corretti." };
+  }
+
+  try {
+    await prisma.category.update({ where: { id }, data: { name } });
+  } catch (err) {
+    return { error: "Errore: dal server" };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
   return { msg: "success" };
 }

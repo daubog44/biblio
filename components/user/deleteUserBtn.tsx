@@ -20,7 +20,7 @@ export function DeleteUser({ user }: { user: User }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="destructive">Elimina</Button>
+                <Button size="sm" variant="destructive">Elimina</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

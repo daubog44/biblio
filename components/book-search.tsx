@@ -7,7 +7,7 @@ import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { Category, Prisma } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation"
 import { useDebouncedCallback } from 'use-debounce';
-import CardBook from "./CardBook"
+import CardBook from "./books/CardBook"
 import Pagination from "./Pagination"
 
 // Mock data for books and categories

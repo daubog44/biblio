@@ -3,7 +3,7 @@
 import * as React from "react"
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/app/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
     Command,
@@ -20,11 +20,11 @@ import {
 import { Book } from "@prisma/client";
 import { useDebouncedCallback } from "use-debounce";
 import { useRouter } from "next/navigation";
-import { Input } from "./ui/input"
+import { Input } from "../ui/input"
 import { SetStateAction } from "react"
 
 type d = React.Dispatch<SetStateAction<{} | undefined>>
-export function ComboboxDemo({ books, per_page, page, setLoanBook }: { setLoanBook: d, page: number, per_page: number, books: Book[] | undefined }) {
+export function ComboboxBooks({ books, per_page, page, setLoanBook }: { setLoanBook: d, page: number, per_page: number, books: Book[] | undefined }) {
     const router = useRouter()
 
     const [open, setOpen] = React.useState(false)
@@ -52,7 +52,7 @@ export function ComboboxDemo({ books, per_page, page, setLoanBook }: { setLoanBo
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full ustify-between"
+                    className="w-full justify-between"
                 >
                     {value !== ""
                         ? values.find((framework) => framework.value === value)?.label

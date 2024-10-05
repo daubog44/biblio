@@ -11,12 +11,18 @@ import { Book, Category, Prisma, User } from "@prisma/client"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useDebouncedCallback } from "use-debounce"
 import { Label } from "./ui/label"
-import { ComboboxDemo } from "./ComboBox"
+import { ComboboxBooks } from "./loans/ComboBoxLoans"
 import { postLoan, restituito } from "@/app/actions/restDB"
 import { useToast } from "@/hooks/use-toast"
-import { DialogModifyUser } from "./EditUserDialog"
-import { DeleteUser } from "./deleteUserBtn"
-import { DialogAddUser } from "./AdduserBtn"
+import { DialogModifyUser } from "./user/EditUserDialog"
+import { DeleteUser } from "./user/deleteUserBtn"
+import { DialogAddUser } from "./user/AdduserBtn"
+import { DialogModifyBook } from "./books/EditBookDialog"
+import { DialogAddBook } from "./books/AddBook"
+import { DeleteBook } from "./books/DeleteBtnBook"
+import { DialogAddCategoria } from "./categories/AddCat"
+import { DialogModifyCat } from "./categories/ModifyCat"
+import { DeleteCat } from "./categories/DeleteCat"
 
 
 type Books = Prisma.BookGetPayload<{ include: { category: true } }>[];
@@ -80,7 +86,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
             <CardHeader>
               <CardTitle>Gestisci utenti</CardTitle>
               <CardDescription>Aggiungi, modifica o rimuovi utenti.</CardDescription>
-              <DialogAddUser />
+              <DialogAddUser btnClasses="mt-4" />
             </CardHeader>
             <CardContent>
               <Input
@@ -110,7 +116,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                         <TableCell>{user.role}</TableCell>
                         <TableCell>
                           {/*<Button variant="outline" size="sm" className="mr-2">Modifica</Button>*/}
-                          <DialogModifyUser user={user} />
+                          <DialogModifyUser btnClasses="mr-2" user={user} />
                           <DeleteUser user={user} />
                         </TableCell>
                       </TableRow>
@@ -136,7 +142,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
               <CardTitle>Gestisci libri</CardTitle>
 
               <CardDescription>Aggiungi, modifica o rimuovi un libro dalla libreria.</CardDescription>
-              <Button className="mt-4">Aggiungi libro</Button>
+              <DialogAddBook btnClasses="w-full mt-4" categories={categories as Category[]} />
             </CardHeader>
             <CardContent>
               <Input
@@ -167,8 +173,9 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                         <TableCell>{book.category.name}</TableCell>
                         <TableCell>{book.annoPubblicazione}</TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm" className="mr-2">Modifica</Button>
-                          <Button variant="destructive" size="sm">Elimina</Button>
+                          {/*<Button variant="outline" size="sm" className="mr-2">Modifica</Button>*/}
+                          <DialogModifyBook btnClasses="mr-2" book={book} categories={categories as Category[]} />
+                          <DeleteBook book={book} />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -191,22 +198,25 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
             <CardHeader>
               <CardTitle>Gestisci categorie</CardTitle>
               <CardDescription>Aggiungi, modifica o elimina una categoria di libri.</CardDescription>
-              <Button className="mt-4">Aggiungi categoria</Button>
+              <DialogAddCategoria btnClasses="mt-4" />
             </CardHeader>
             <CardContent>
               <Input
                 placeholder="Cerca categorie..."
                 value={categorySearch}
-                onChange={(e) => { setCategorySearch(e.target.value); debounced(e.target.value) }}
+                onChange={(e) => { setCategorySearch(e.target.value); }}
                 className="mb-4"
               />
               <ul className="space-y-2">
-                {categories && categories.map((category, index) => (
+                {categories && categories.filter(cat => {
+                  if (categorySearch) { return cat.name.toLowerCase().includes(categorySearch.toLowerCase()) }
+                  return true;
+                }).map((category, index) => (
                   <li key={index} className="flex items-center justify-between">
                     <span>{category.name}</span>
                     <div>
-                      <Button variant="outline" size="sm" className="mr-2">Modifica</Button>
-                      <Button variant="destructive" size="sm">Elimina</Button>
+                      <DialogModifyCat btnClasses="mr-2" category={category} />
+                      <DeleteCat category={category} categories={categories} />
                     </div>
                   </li>
                 ))}
@@ -249,7 +259,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                           <SelectItem key={book.id} value={book.id.toString()}>{book.titolo}</SelectItem>
                         ))}
                       </SelectContent>*/}
-                    <ComboboxDemo setLoanBook={setLoanBook as any} page={Number(page)} per_page={Number(per_page)} books={books} />
+                    <ComboboxBooks setLoanBook={setLoanBook as any} page={Number(page)} per_page={Number(per_page)} books={books} />
                   </div>
                   <div>
                     <Label htmlFor="user-input">Dettagli prestito</Label>

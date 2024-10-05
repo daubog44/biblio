@@ -1,11 +1,10 @@
-
 import { AdminDashboardComponent } from "@/components/admin-dashboard";
 import Loading from "@/components/Loading";
-import { booksGet, getAllCategories, getLoans, userGet } from "@/lib/callDB";
+import { booksGet, getAllCategories, getLoans, userGet } from "@/app/lib/callDB";
 import {
     getUser
-} from "@/lib/dal";
-import prisma from "@/lib/utils";
+} from "@/app/lib/dal";
+import prisma from "@/app/lib/utils";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -43,8 +42,9 @@ async function Body({
     let books, categories, users, userCount, booksCount, loans;
 
 
-    if (query && typeof query === "string" && section === "book")
-        [books, booksCount] = await Promise.all([prisma.book.findMany({
+    if (query && typeof query === "string" && section === "book") {
+
+        [categories, books, booksCount] = await Promise.all([getAllCategories(), prisma.book.findMany({
             skip: start,
             take: Number(per_page),
             include: { category: true },
@@ -62,8 +62,9 @@ async function Body({
                 ],
             },
         })]);
+    }
     else if (section && section === "book") {
-        [books, booksCount] = await booksGet(start, Number(per_page))
+        [[books, booksCount], categories] = await Promise.all([booksGet(start, Number(per_page)), getAllCategories()])
     }
 
     else if (query && typeof query === "string" && section === "user") {

@@ -1,3 +1,5 @@
+"use server";
+import "server-only";
 import { cache } from "react";
 import prisma from "./utils";
 
@@ -7,6 +9,11 @@ export const booksGet = cache(async (start: number, per_page: number) => {
       skip: start,
       include: { category: true },
       take: Number(per_page),
+      orderBy: {
+        category: {
+          name: "asc",
+        },
+      },
     }),
     prisma.book.count(),
   ]);
@@ -23,7 +30,11 @@ export const userGet = cache(async (start: number, per_page: number) => {
 });
 
 export const getAllCategories = cache(async () => {
-  return await prisma.category.findMany({});
+  return await prisma.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
 });
 
 export const booksGetByCat = cache(

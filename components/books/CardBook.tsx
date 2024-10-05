@@ -1,8 +1,8 @@
 "use client";
 import { Prisma } from "@prisma/client";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card";
 import Image from "next/image";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 import { BookCover } from 'book-cover-3d'
 import { BookOpen, BookX } from "lucide-react";
 
@@ -35,11 +35,11 @@ export default function CardBook({ book }: { book: Prisma.BookGetPayload<{ inclu
             </CardHeader>
             <CardContent className="relative">
                 <CardTitle className="text-wrap text-lg pr-4 w-fit truncate">{book.titolo && book.titolo?.length > 100 ? book.titolo?.slice(0, 100) + "..." : book.titolo}</CardTitle>
-                <p className="mt-4 text-sm font-semibold mb-1 w-fit">Di {book.autore}</p>
+                <p className="mt-4 text-sm font-semibold mb-1 w-fit">{book.autore && "Di"} {book.autore}</p>
                 <p className="text-sm text-muted-foreground mb-2 w-fit">
-                    pubblicato il: {book.annoPubblicazione}, dalla casa: {book.casaEditrice}
+                    {book.annoPubblicazione ? `pubblicato il: ${book.annoPubblicazione}` : ""}{book.casaEditrice ? `${book.annoPubblicazione && ", "}dalla casa: ${book.casaEditrice}` : ""}
                 </p>
-                <p className="text-sm">{book.note}</p>
+                <p className="text-sm">{book.note}{book.scompartoCase ? `, scomparto: ${book.scompartoCase}` : ""}</p>
             </CardContent>
             <CardFooter className="flex justify-between">
                 <span className="text-sm text-muted-foreground">{book.category.name}</span>

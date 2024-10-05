@@ -11,16 +11,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { User } from "@prisma/client"
 import { useFormState, useFormStatus } from "react-dom"
 import { useEffect, useRef, useState } from "react"
 import { modifyUser } from "@/app/actions/restDB"
-import { Alert, AlertDescription } from "./ui/alert"
+import { Alert, AlertDescription } from "../ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { EyeOff, Eye } from "lucide-react";
 
-export function DialogModifyUser({ user }: { user: User }) {
+export function DialogModifyUser({ user, btnClasses }: { btnClasses?: string, user: User }) {
     const { toast } = useToast();
     const [state, setState] = useState({ id: user.id } as { [key: string]: string | number });
     const [showPassword, setShowPassword] = useState(false);
@@ -28,14 +28,13 @@ export function DialogModifyUser({ user }: { user: User }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">Modifica</Button>
+                <Button variant="outline" size="sm" className={btnClasses}>Modifica</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Modifica</DialogTitle>
                 </DialogHeader>
                 <form>
-                    <input type="hidden" name="id" value={user.id} />
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="numero" className="text-right">
@@ -111,11 +110,6 @@ export function DialogModifyUser({ user }: { user: User }) {
                         }} type="submit">Salva modifiche</Button>
                     </DialogFooter>
                 </form>
-                {state?.error && (
-                    <Alert variant="destructive">
-                        <AlertDescription>{state.error}</AlertDescription>
-                    </Alert>
-                )}
             </DialogContent>
         </Dialog>
     )

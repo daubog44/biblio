@@ -1,8 +1,8 @@
 
 import { BookSearchComponent } from '@/components/book-search';
-import { booksGet, booksGetByCat, getAllCategories } from '@/lib/callDB';
-import { getUser } from '@/lib/dal'
-import prisma from '@/lib/utils';
+import { booksGet, booksGetByCat, getAllCategories } from '@/app/lib/callDB';
+import { getUser } from '@/app/lib/dal'
+import prisma from '@/app/lib/utils';
 import { cookies } from 'next/headers';
 import { redirect } from "next/navigation";
 

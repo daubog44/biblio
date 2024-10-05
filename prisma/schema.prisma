@@ -22,7 +22,7 @@ model Category {
 model Book {
   id                Int      @id @default(autoincrement())
   categoryId        Int
-  category          Category @relation(fields: [categoryId], references: [id])
+  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   autore            String?
   titolo            String
   casaEditrice      String?

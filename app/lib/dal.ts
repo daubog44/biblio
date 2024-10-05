@@ -1,5 +1,7 @@
+"use server";
+import "server-only";
 import { cookies } from "next/headers";
-import { decrypt } from "@/lib/session";
+import { decrypt } from "@/app/lib/session";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import prisma from "./utils";

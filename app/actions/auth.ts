@@ -1,10 +1,10 @@
 "use server";
-import { createSession, deleteSession } from "@/lib/session";
-import { FormState, SigninFormSchema } from "@/lib/definitions";
+import { createSession, deleteSession } from "@/app/lib/session";
+import { FormState, SigninFormSchema } from "@/app/lib/definitions";
 import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
-import prisma from "@/lib/utils";
-import { getUser, verifySession } from "@/lib/dal";
+import prisma from "@/app/lib/utils";
+import { getUser, verifySession } from "@/app/lib/dal";
 
 export async function getUserM() {
   const user = await getUser();
@@ -47,9 +47,7 @@ export async function signin(formstate: FormState, formData: FormData) {
     verifySession(false),
   ]);
   if (session) {
-    return {
-      message: "hai già eseguito il login!",
-    };
+    return redirect("/");
   }
   if (!user) {
     return {

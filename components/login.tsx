@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { signin } from "@/app/actions/auth"
 import { useFormState, useFormStatus } from "react-dom"
-import { FormState } from "@/lib/definitions"
+import { FormState } from "@/app/lib/definitions"
 
 const initialState = {} as FormState;
 

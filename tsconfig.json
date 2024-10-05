@@ -21,7 +21,7 @@
     "paths": {
       "@/*": ["./*"],
       "@components": ["./app/components"],
-      "@utils": ["./lib/utils.ts"]
+      "@utils": ["app/lib/utils.ts"]
     }
   },
   "include": [

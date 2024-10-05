@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/dal";
+import { getUser } from "@/app/lib/dal";
 import NavBarClient from "./NbarClientPart";
 import { redirect } from "next/navigation";
 

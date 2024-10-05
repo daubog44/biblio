@@ -1,7 +1,7 @@
 "use server";
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
-import { SessionPayload } from "@/lib/definitions";
+import { SessionPayload } from "@/app/lib/definitions";
 import { cookies } from "next/headers";
 
 export async function deleteSession() {
