@@ -479,7 +479,6 @@ export async function deleteCat(id: number, replaBooksTo?: number) {
   }
 
   try {
-    console.log(id);
     if (replaBooksTo) {
       await prisma.book.updateMany({
         where: { categoryId: id },
@@ -490,7 +489,6 @@ export async function deleteCat(id: number, replaBooksTo?: number) {
     }
     await prisma.category.delete({ where: { id } });
   } catch (err) {
-    console.log(err);
     return { error: "Errore dal server" };
   }
 

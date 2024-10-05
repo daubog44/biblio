@@ -74,7 +74,6 @@ export function ComboboxBooks({ books, per_page, page, setLoanBook }: { setLoanB
                                     key={framework.value}
                                     value={framework.value}
                                     onSelect={(currentValue) => {
-                                        console.log("currentValue", currentValue);
                                         setValue(currentValue)
                                         setLoanBook(currentValue);
                                         setOpen(false)
