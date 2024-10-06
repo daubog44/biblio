@@ -17,6 +17,10 @@ export async function logout() {
   redirect("/login");
 }
 
+export async function deleteCookie() {
+  deleteSession();
+}
+
 export async function signin(formstate: FormState, formData: FormData) {
   // Previous steps:
   // 1. Validate form fields

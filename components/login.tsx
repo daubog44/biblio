@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { logout, signin } from "@/app/actions/auth"
+import { deleteCookie, signin } from "@/app/actions/auth"
 import { useFormState, useFormStatus } from "react-dom"
 import { FormState } from "@/app/lib/definitions"
 
@@ -33,7 +33,7 @@ export function Login({ session }: { session: string | undefined | null }) {
 
   useEffect(() => {
     (async () => {
-      if (session) await logout();
+      if (session) await deleteCookie();
     })()
     setLoad(true);
   }, [session])

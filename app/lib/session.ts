@@ -5,7 +5,7 @@ import { SessionPayload } from "@/app/lib/definitions";
 import { cookies } from "next/headers";
 
 export async function deleteSession() {
-  cookies().delete("session");
+  if (cookies().has("session")) cookies().delete("session");
 }
 
 export async function createSession(userId: number, role: string) {
