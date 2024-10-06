@@ -13,12 +13,13 @@ export async function getUserM() {
 }
 
 export async function logout() {
-  deleteSession();
+  await deleteSession();
   redirect("/login");
 }
 
 export async function deleteCookie() {
   await deleteSession();
+  return null;
 }
 
 export async function signin(formstate: FormState, formData: FormData) {
@@ -37,22 +38,16 @@ export async function signin(formstate: FormState, formData: FormData) {
   }
 
   const { email, password } = validatedFields.data;
-  const [user, session] = await Promise.all([
-    prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-      select: {
-        password: true,
-        role: true,
-        id: true,
-      },
-    }),
-    verifySession(false),
-  ]);
-  if (session) {
-    return redirect("/");
-  }
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      password: true,
+      role: true,
+      id: true,
+    },
+  });
   if (!user) {
     return {
       message: "le credenziali sono sbagliate!",
