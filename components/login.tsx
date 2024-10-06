@@ -8,13 +8,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { signin } from "@/app/actions/auth"
+import { logout, signin } from "@/app/actions/auth"
 import { useFormState, useFormStatus } from "react-dom"
 import { FormState } from "@/app/lib/definitions"
 
 const initialState = {} as FormState;
 
-export function Login() {
+export function Login({ session }: { session: string | undefined }) {
   const [state, formAction] = useFormState(signin, initialState)
   const { pending } = useFormStatus()
   const [email, setEmail] = useState("")
@@ -32,8 +32,11 @@ export function Login() {
   }, [state])
 
   useEffect(() => {
+    (async () => {
+      if (session) await logout();
+    })()
     setLoad(true);
-  }, [])
+  }, [session])
 
   if (load)
     return (

@@ -43,7 +43,7 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
       }`);
     router.prefetch(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
       }`);
-  }, [router])
+  }, [category, page])
 
   const debounced = useDebouncedCallback(
     // function
