@@ -7,18 +7,22 @@ import { cache } from "react";
 import prisma from "./utils";
 
 export const verifySession = cache(async (withredirect = true) => {
-  const cookie = cookies().get("session")?.value;
+  try {
+    const cookie = cookies().get("session")?.value;
 
-  const session = (await decrypt(cookie)) as { userId: number; role: string };
+    const session = (await decrypt(cookie)) as { userId: number; role: string };
 
-  if (!session?.userId) {
-    if (withredirect) redirect("/login");
-    else return null;
+    if (!session?.userId) {
+      if (withredirect) redirect("/login");
+      else return null;
+    }
+    return {
+      role: session.role as "ADMIN" | "VIEWER",
+      userId: session.userId as number,
+    };
+  } catch (err) {
+    return null;
   }
-  return {
-    role: session.role as "ADMIN" | "VIEWER",
-    userId: session.userId as number,
-  };
 });
 
 export const getUser = cache(async () => {

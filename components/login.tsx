@@ -14,7 +14,7 @@ import { FormState } from "@/app/lib/definitions"
 
 const initialState = {} as FormState;
 
-export function Login({ session }: { session: string | undefined }) {
+export function Login({ session }: { session: string | undefined | null }) {
   const [state, formAction] = useFormState(signin, initialState)
   const { pending } = useFormStatus()
   const [email, setEmail] = useState("")

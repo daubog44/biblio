@@ -1,7 +1,7 @@
 import { Login } from "@/components/login";
-import { cookies } from "next/headers";
+import { getUser } from "../lib/dal";
 
 export default async function Page() {
-    const session = cookies().get("session")?.value;
-    return <Login session={session} />
+    const session = await getUser();
+    return <Login session={session?.name} />
 }
