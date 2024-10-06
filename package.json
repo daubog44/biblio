@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "dotenv": "^16.4.5",
+    "export-to-csv": "^1.4.0",
     "jose": "^5.9.3",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",

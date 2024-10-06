@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useCallback, useState, useTransition } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -24,6 +24,8 @@ import { DialogAddCategoria } from "./categories/AddCat"
 import { DialogModifyCat } from "./categories/ModifyCat"
 import { DeleteCat } from "./categories/DeleteCat"
 import Loading from "./Loading"
+import { downloadCsv } from "@/app/actions/utils"
+import Link from "next/link"
 
 
 type Books = Prisma.BookGetPayload<{ include: { category: true } }>[];
@@ -40,6 +42,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
   const [isPending, startTransition] = useTransition()
   const [userSearch, setUserSearch] = useState("")
   const [bookSearch, setBookSearch] = useState("")
+  const [isDownloading, setIsDownloading] = useState(false)
   const [loanUser, setLoanUser] = useState("")
   const [loanBook, setLoanBook] = useState<number | undefined>()
 
@@ -68,6 +71,26 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
       router.push(`/admin?page=${Number(page) + 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
     });
   }
+
+  const handleDownloadFromUrl = useCallback(async (url: string, filename: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      toast({
+        variant: "destructive", title: "Uh oh! Qualcosa è andato storto.",
+        description: (error as Error).message,
+      })
+    }
+  }, [toast])
 
   return (
     <div className="container mx-auto p-4">
@@ -147,10 +170,32 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
         <TabsContent value="book">
           <Card>
             <CardHeader>
-              <CardTitle>Gestisci libri</CardTitle>
+              <CardTitle>
+                <div className="w-full flex justify-between">
+                  <p>Gestisci libri</p> <Button
+                    variant="secondary"
+                    type="submit"
+                    disabled={isDownloading}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      setIsDownloading(true);
+                      const res = await downloadCsv();
+                      setIsDownloading(false)
 
+                      if (res.error) {
+                        toast({
+                          variant: "destructive", title: "Uh oh! Qualcosa è andato storto.",
+                          description: res.error,
+                        })
+                      } else if (res.download) {
+                        handleDownloadFromUrl(res.download, res.filename);
+                      }
+                    }}
+                    className="w-32"
+                  >{isDownloading ? "Aspetta..." : "Esporta dati"}</Button></div></CardTitle>
               <CardDescription>Aggiungi, modifica o rimuovi un libro dalla libreria.</CardDescription>
               <DialogAddBook btnClasses="w-full mt-4" categories={categories as Category[]} />
+
             </CardHeader>
             <CardContent>
               <Input
