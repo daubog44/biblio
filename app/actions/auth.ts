@@ -18,7 +18,7 @@ export async function logout() {
 }
 
 export async function deleteCookie() {
-  deleteSession();
+  await deleteSession();
 }
 
 export async function signin(formstate: FormState, formData: FormData) {
