@@ -19,3 +19,6 @@ if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export const waituntil = (mills: number) =>
+  new Promise((res) => setTimeout(res, mills));

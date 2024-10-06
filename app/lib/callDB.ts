@@ -83,11 +83,9 @@ export const categoryWithCount = cache(async () => {
   return categoriesWithCount;
 });
 
-export const getLoans = cache(async (start: number, per_page: number) => {
+export const getLoans = cache(async () => {
   return await Promise.all([
     prisma.book.findMany({
-      skip: start,
-      take: per_page,
       where: {
         inPrestito: true,
       },

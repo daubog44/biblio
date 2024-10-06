@@ -4,24 +4,11 @@ import { booksGet, getAllCategories, getLoans, userGet } from "@/app/lib/callDB"
 import {
     getUser
 } from "@/app/lib/dal";
-import prisma from "@/app/lib/utils";
+import prisma, { waituntil } from "@/app/lib/utils";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 
 
 export default async function Admin({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined }
-}) {
-    return (
-        <Suspense fallback={<Loading />}>
-            <Body searchParams={searchParams} />
-        </Suspense>
-    )
-}
-
-async function Body({
     searchParams,
 }: {
     searchParams: { [key: string]: string | string[] | undefined }
@@ -100,7 +87,7 @@ async function Body({
     else if (section && section === "category") {
         categories = await getAllCategories();
     } else if (section && section === "loan") {
-        [loans, booksCount] = await getLoans(start, Number(per_page));
+        [loans, booksCount] = await getLoans();
         if (query && typeof query === "string")
             books = await prisma.book.findMany({
                 skip: start,

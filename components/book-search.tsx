@@ -1,14 +1,16 @@
 "use client"
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search } from "lucide-react"
 import { Category, Prisma } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation"
 import { useDebouncedCallback } from 'use-debounce';
 import CardBook from "./books/CardBook"
 import Pagination from "./Pagination"
+import Loading from "@/components/Loading";
+import React from "react"
 
 // Mock data for books and categories
 /*
@@ -25,6 +27,8 @@ const categories = ["All", "Fiction", "Science Fiction", "Romance", "Adventure"]
 
 export function BookSearchComponent({ books, count, totalPages, hasNextPage, hasPrevPage, categories }: { count: number, categories: Category[], books: Prisma.BookGetPayload<{ include: { category: true } }>[], totalPages: number, hasPrevPage: boolean, hasNextPage: boolean }) {
   const router = useRouter()
+
+  const [isPending, startTransition] = useTransition()
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? '1'
   const per_page = searchParams.get('limit') ?? '8'
@@ -32,24 +36,39 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
   const category = searchParams.get('category');
   const query = searchParams.get('query');
   const [searchTerm, setSearchTerm] = useState("")
+
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name)
+  useEffect(() => {
+    router.prefetch(`/?page=${Number(page) - 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+      }`);
+    router.prefetch(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+      }`);
+  }, [router])
+
   const debounced = useDebouncedCallback(
     // function
     (_val) => {
-      router.push(`/?page=${1}&limit=${per_page}&query=${searchTerm.trim() || ""}`, { scroll: false })
+      startTransition(() => {
+        router.push(`/?page=${1}&limit=${per_page}&query=${searchTerm.trim() || ""}`, { scroll: false })
+      })
     },
     // delay in ms
     1000
   );
 
   const handlePrev = () => {
-    router.push(`/?page=${Number(page) - 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
-      }`, { scroll: false })
+    startTransition(() => {
+      router.push(`/?page=${Number(page) - 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+        }`, { scroll: false })
+    })
   }
 
   const handleNext = () => {
-    router.push(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
-      }`, { scroll: false })
+    startTransition(() => {
+      router.push(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+        }`, { scroll: false })
+    })
+
   }
 
   return (
@@ -102,18 +121,19 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
         </TabsContent>
       </Tabs>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {books.map((book) => (
-          <CardBook book={book} key={book.id} />
-        ))}
-      </div>
-
+      {isPending ? <Loading hFit={true} /> :
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {books.map((book) => (
+            <CardBook book={book} key={book.id} />
+          ))}
+        </div>
+      }
       {count === 0 && (
         <p className="text-center text-muted-foreground mt-6">No books found. Try a different search term or category.</p>
       )}
 
       {count > 0 && (
-        <Pagination hasNextPage={hasNextPage} page={Number(page)} totalPages={totalPages} hasPrevPage={hasPrevPage} handelPrev={handlePrev} handleNext={handleNext} />
+        <Pagination isPending={isPending} hasNextPage={hasNextPage} page={Number(page)} totalPages={totalPages} hasPrevPage={hasPrevPage} handelPrev={handlePrev} handleNext={handleNext} />
       )}
     </div>
   )

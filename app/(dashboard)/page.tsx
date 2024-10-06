@@ -3,7 +3,6 @@ import { BookSearchComponent } from '@/components/book-search';
 import { booksGet, booksGetByCat, getAllCategories } from '@/app/lib/callDB';
 import { getUser } from '@/app/lib/dal'
 import prisma from '@/app/lib/utils';
-import { cookies } from 'next/headers';
 import { redirect } from "next/navigation";
 
 export default async function Home({
@@ -25,7 +24,6 @@ export default async function Home({
   const end = start + Number(per_page) // 5, 10, 15 ...
   const categories = await getAllCategories();
   let books, count;
-
   //if (query?.length === 4 && Number(query))
 
   if (query && typeof query === "string")

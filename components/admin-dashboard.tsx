@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -23,6 +23,7 @@ import { DeleteBook } from "./books/DeleteBtnBook"
 import { DialogAddCategoria } from "./categories/AddCat"
 import { DialogModifyCat } from "./categories/ModifyCat"
 import { DeleteCat } from "./categories/DeleteCat"
+import Loading from "./Loading"
 
 
 type Books = Prisma.BookGetPayload<{ include: { category: true } }>[];
@@ -36,6 +37,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
   const per_page = searchParams.get('limit') ?? '8'
   const section = searchParams.get('section') ?? "user";
   const query = searchParams.get('query');
+  const [isPending, startTransition] = useTransition()
   const [userSearch, setUserSearch] = useState("")
   const [bookSearch, setBookSearch] = useState("")
   const [loanUser, setLoanUser] = useState("")
@@ -46,7 +48,9 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
   const debounced = useDebouncedCallback(
     // function
     (val) => {
-      router.push(`/admin?page=${1}&limit=${per_page}&section=${section || "users"}&query=${val || ""}`, { scroll: false })
+      startTransition(() => {
+        router.push(`/admin?page=${1}&limit=${per_page}&section=${section || "users"}&query=${val || ""}`, { scroll: false })
+      })
     },
     // delay in ms
     1000
@@ -54,11 +58,15 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
 
 
   const handlePrev = () => {
-    router.push(`/admin?page=${Number(page) - 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
+    startTransition(() => {
+      router.push(`/admin?page=${Number(page) - 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
+    });
   }
 
   const handleNext = () => {
-    router.push(`/admin?page=${Number(page) + 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
+    startTransition(() => {
+      router.push(`/admin?page=${Number(page) + 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
+    });
   }
 
   return (
@@ -98,7 +106,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                 }}
                 className="mb-4"
               />
-              <div className="overflow-x-auto">
+              {isPending ? <Loading hFit={true} /> : <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -123,13 +131,13 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                     ))}
                   </TableBody>
                 </Table>
-              </div>
+              </div>}
               {userCount === 0 && (
                 <p className="text-center text-muted-foreground mt-6">Nessun utente.</p>
               )}
 
               {userCount && userCount > 0 && (
-                <Pagination page={Number(page)} totalPages={Math.ceil(userCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < userCount} handelPrev={handlePrev} handleNext={handleNext} />
+                <Pagination isPending={isPending} page={Number(page)} totalPages={Math.ceil(userCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < userCount} handelPrev={handlePrev} handleNext={handleNext} />
               )}
 
             </CardContent>
@@ -154,7 +162,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                 }}
                 className="mb-4"
               />
-              <div className="overflow-x-auto">
+              {isPending ? <Loading hFit={true} /> : <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -181,13 +189,13 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                     ))}
                   </TableBody>
                 </Table>
-              </div>
+              </div>}
               {booksCount === 0 && (
                 <p className="text-center text-muted-foreground mt-6">Nessun libro.</p>
               )}
 
               {booksCount && booksCount > 0 && (
-                <Pagination page={Number(page)} totalPages={Math.ceil(booksCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < booksCount} handelPrev={handlePrev} handleNext={handleNext} />
+                <Pagination isPending={isPending} page={Number(page)} totalPages={Math.ceil(booksCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < booksCount} handelPrev={handlePrev} handleNext={handleNext} />
               )}
             </CardContent>
           </Card>
@@ -207,7 +215,8 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                 onChange={(e) => { setCategorySearch(e.target.value); }}
                 className="mb-4"
               />
-              <ul className="space-y-2">
+
+              {isPending ? <Loading hFit={true} /> : <ul className="space-y-2">
                 {categories && categories.filter(cat => {
                   if (categorySearch) { return cat.name.toLowerCase().includes(categorySearch.toLowerCase()) }
                   return true;
@@ -218,9 +227,8 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                       <DialogModifyCat btnClasses="mr-2" category={category} />
                       <DeleteCat category={category} categories={categories} />
                     </div>
-                  </li>
-                ))}
-              </ul>
+                  </li>))}
+              </ul>}
             </CardContent>
           </Card>
         </TabsContent>
@@ -247,7 +255,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
+              {isPending ? <Loading hFit={false} /> : <div className="grid gap-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="book-select">Seleziona libro</Label>
@@ -311,7 +319,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                 {loans && loans.length === 0 && (
                   <p className="text-center text-muted-foreground mt-6">Nessun libro in prestito.</p>
                 )}
-              </div>
+              </div>}
             </CardContent>
           </Card>
         </TabsContent>
