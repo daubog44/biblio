@@ -17,7 +17,7 @@ export default async function Home({
   }
 
   const page = searchParams['page'] ?? '1'
-  const per_page = searchParams['limit'] ?? '8'
+  const per_page = searchParams['limit'] ?? '16'
   const category = searchParams['category'];
   const query = searchParams['query'];
   const start = (Number(page) - 1) * Number(per_page) // 0, 5, 10 ...

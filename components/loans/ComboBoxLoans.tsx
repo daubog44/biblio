@@ -52,7 +52,7 @@ export function ComboboxBooks({ books, per_page, page, setLoanBook }: { setLoanB
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full justify-between"
+                    className="w-full justify-between text-clip text-wrap min-h-fit"
                 >
                     {value !== ""
                         ? values.find((framework) => framework.value === value)?.label

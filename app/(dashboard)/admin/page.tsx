@@ -23,7 +23,7 @@ export default async function Admin({
     const page = searchParams['page'] ?? '1'
     const query = searchParams['query'];
     const section = searchParams['section'] ?? "user" as "user" | "book" | "category" | "loan";
-    const per_page = searchParams['limit'] ?? '8'
+    const per_page = searchParams['limit'] ?? '16'
     const start = (Number(page) - 1) * Number(per_page) // 0, 5, 10 ...
     const end = start + Number(per_page)
     let books, categories, users, userCount, booksCount, loans;

@@ -58,17 +58,9 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
     // delay in ms
     1000
   );
-
-
-  const handlePrev = () => {
+  const handlePage = (newPage: number) => {
     startTransition(() => {
-      router.push(`/admin?page=${Number(page) - 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
-    });
-  }
-
-  const handleNext = () => {
-    startTransition(() => {
-      router.push(`/admin?page=${Number(page) + 1}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
+      router.push(`/admin?page=${newPage}&limit=${per_page}&section=${section || "users"}&query=${query || ""}`, { scroll: false })
     });
   }
 
@@ -160,7 +152,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
               )}
 
               {userCount && userCount > 0 && (
-                <Pagination isPending={isPending} page={Number(page)} totalPages={Math.ceil(userCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < userCount} handelPrev={handlePrev} handleNext={handleNext} />
+                <Pagination isPending={isPending} page={Number(page)} totalPages={Math.ceil(userCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < userCount} handelPage={handlePage} />
               )}
 
             </CardContent>
@@ -240,7 +232,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
               )}
 
               {booksCount && booksCount > 0 && (
-                <Pagination isPending={isPending} page={Number(page)} totalPages={Math.ceil(booksCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < booksCount} handelPrev={handlePrev} handleNext={handleNext} />
+                <Pagination isPending={isPending} page={Number(page)} totalPages={Math.ceil(booksCount / Number(per_page))} hasPrevPage={start > 0} hasNextPage={end < booksCount} handelPage={handlePage} />
               )}
             </CardContent>
           </Card>

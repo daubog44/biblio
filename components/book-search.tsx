@@ -56,16 +56,9 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
     1000
   );
 
-  const handlePrev = () => {
+  const handlePage = (newpage: number) => {
     startTransition(() => {
-      router.push(`/?page=${Number(page) - 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
-        }`, { scroll: false })
-    })
-  }
-
-  const handleNext = () => {
-    startTransition(() => {
-      router.push(`/?page=${Number(page) + 1}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
+      router.push(`/?page=${newpage}&limit=${per_page}&category=${category || ""}&query=${query || ""}&prev_page=${prev_page || ""
         }`, { scroll: false })
     })
 
@@ -110,8 +103,10 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
                 key={category.name}
                 variant={selectedCategory === category.name ? "default" : "outline"}
                 onClick={() => {
-                  router.push(`/?page=${1}&limit=${per_page}&category=${category.name || ""}&prev_page=${prev_page || ""}`, { scroll: false })
-                  setSelectedCategory(category.name);
+                  startTransition(() => {
+                    router.push(`/?page=${1}&limit=${per_page}&category=${category.name || ""}&prev_page=${prev_page || ""}`, { scroll: false })
+                    setSelectedCategory(category.name);
+                  })
                 }}
               >
                 {category.name}
@@ -133,7 +128,7 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
       )}
 
       {count > 0 && (
-        <Pagination isPending={isPending} hasNextPage={hasNextPage} page={Number(page)} totalPages={totalPages} hasPrevPage={hasPrevPage} handelPrev={handlePrev} handleNext={handleNext} />
+        <Pagination isPending={isPending} hasNextPage={hasNextPage} page={Number(page)} totalPages={totalPages} hasPrevPage={hasPrevPage} handelPage={handlePage} />
       )}
     </div>
   )
