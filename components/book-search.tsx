@@ -103,8 +103,8 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
                 key={category.name}
                 variant={selectedCategory === category.name ? "default" : "outline"}
                 onClick={() => {
+                  setSelectedCategory(category.name);
                   startTransition(() => {
-                    setSelectedCategory(category.name);
                     router.push(`/?page=${1}&limit=${per_page}&category=${category.name || ""}&prev_page=${prev_page || ""}`, { scroll: false })
                   })
                 }}
