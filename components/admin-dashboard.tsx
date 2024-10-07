@@ -298,7 +298,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
               </Button>
             </CardHeader>
             <CardContent>
-              {isPending ? <Loading hFit={false} /> : <div className="grid gap-4">
+              {isPending ? <Loading hFit={true} /> : <div className="grid gap-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="book-select">Seleziona libro</Label>
