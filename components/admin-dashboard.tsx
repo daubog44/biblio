@@ -91,16 +91,22 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
       <Tabs defaultValue={section}>
         <TabsList className="mb-4 flex flex-wrap h-fit">
           <TabsTrigger onClick={() => {
-            router.push(`/admin?page=${1}&limit=${per_page}&section=user`, { scroll: false })
+            startTransition(() => {
+              router.push(`/admin?page=${1}&limit=${per_page}&section=user`, { scroll: false })
+            })
           }} value="user">Utenti</TabsTrigger>
           <TabsTrigger onClick={() => {
-            router.push(`/admin?page=${1}&limit=${per_page}&section=book`, { scroll: false })
+            startTransition(() => { router.push(`/admin?page=${1}&limit=${per_page}&section=book`, { scroll: false }) })
           }} value="book">Libri</TabsTrigger>
           <TabsTrigger onClick={() => {
-            router.push(`/admin?page=${1}&limit=${per_page}&section=category`, { scroll: false })
+            startTransition(() => {
+              router.push(`/admin?page=${1}&limit=${per_page}&section=category`, { scroll: false })
+            })
           }} value="category">Categorie</TabsTrigger>
           <TabsTrigger onClick={() => {
-            router.push(`/admin?page=${1}&limit=${per_page}&section=loan&query=`, { scroll: false })
+            startTransition(() => {
+              router.push(`/admin?page=${1}&limit=${per_page}&section=loan&query=`, { scroll: false })
+            })
           }} value="loan">In prestito</TabsTrigger>
         </TabsList>
 

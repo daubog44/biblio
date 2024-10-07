@@ -22,11 +22,12 @@ import { useDebouncedCallback } from "use-debounce";
 import { useRouter } from "next/navigation";
 import { Input } from "../ui/input"
 import { SetStateAction } from "react"
+import Loading from "../Loading"
 
 type d = React.Dispatch<SetStateAction<{} | undefined>>
 export function ComboboxBooks({ books, per_page, page, setLoanBook }: { setLoanBook: d, page: number, per_page: number, books: Book[] | undefined }) {
     const router = useRouter()
-
+    const [isPending, startTransition] = React.useTransition()
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
     const [searchValue, setSearchValue] = React.useState("")
@@ -34,7 +35,10 @@ export function ComboboxBooks({ books, per_page, page, setLoanBook }: { setLoanB
     const debounced = useDebouncedCallback(
         // function
         (val) => {
-            router.push(`/admin?page=${page}&limit=${per_page}&section=loan&query=${val.trim() || ""}`, { scroll: false })
+            if (val)
+                startTransition(() => {
+                    router.push(`/admin?page=${page}&limit=${per_page}&section=loan&query=${val.trim() || ""}`, { scroll: false })
+                })
         },
         // delay in ms
         1000
@@ -67,9 +71,9 @@ export function ComboboxBooks({ books, per_page, page, setLoanBook }: { setLoanB
                         debounced(e.target.value)
                     }} placeholder="Cerca libro..." className="h-9" />
                     <CommandList>
-                        <CommandEmpty>Nessun libro trovato.</CommandEmpty>
+                        <CommandEmpty>{!isPending && "Nessun libro trovato."}</CommandEmpty>
                         <CommandGroup>
-                            {values.map((framework) => (
+                            {isPending ? <div className="mb-4"><Loading hFit /></div> : values.map((framework) => (
                                 <CommandItem
                                     key={framework.value}
                                     value={framework.value}

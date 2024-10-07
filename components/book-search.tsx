@@ -71,10 +71,14 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
       <Tabs defaultValue="search" className="mb-6">
         <TabsList>
           <TabsTrigger onClick={() => {
-            router.push(`/?page=${prev_page || 1}&limit=${per_page}`, { scroll: false })
+            startTransition(() => {
+              router.push(`/?page=${prev_page || 1}&limit=${per_page}`, { scroll: false })
+            })
           }} value="search">Carca libro</TabsTrigger>
           <TabsTrigger onClick={() => {
-            router.push(`/?page=${1}&limit=${per_page}&prev_page=${page}&category=${categories[0].name}`, { scroll: false })
+            startTransition(() => {
+              router.push(`/?page=${1}&limit=${per_page}&prev_page=${page}&category=${categories[0].name}`, { scroll: false })
+            })
           }} value="categories">categorie</TabsTrigger>
         </TabsList>
         <TabsContent value="search">
@@ -90,7 +94,9 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
               className="flex-grow"
             />
             <Button onClick={() => {
-              router.push(`/?page=${1}&limit=${per_page}&query=${searchTerm.trim() || ""}`, { scroll: false })
+              startTransition(() => {
+                router.push(`/?page=${1}&limit=${per_page}&query=${searchTerm.trim() || ""}`, { scroll: false })
+              })
             }}>
               <Search className="mr-2 h-4 w-4" /> Search
             </Button>
