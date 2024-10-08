@@ -191,7 +191,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
                     }}
                     className="w-32"
                   >{isDownloading ? "Aspetta..." : "Esporta dati"}</Button></div></CardTitle>
-              <CardDescription>Aggiungi, modifica o rimuovi un libro dalla libreria. Per esportare i dati aggiornati, le modifiche ai singoli libri non vengono contati, invece bisogna aggiungere o eliminare un libro.</CardDescription>
+              <CardDescription>Aggiungi, modifica o rimuovi un libro dalla libreria.</CardDescription>
               <DialogAddBook btnClasses="w-full mt-4" categories={categories as Category[]} />
 
             </CardHeader>

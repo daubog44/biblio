@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import { Book } from "@prisma/client";
 import _ from "lodash";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { deleteCsv } from "./utils";
 
 export async function postLoan(data: any) {
   const verify = await verifySession(false);
@@ -346,6 +347,9 @@ export async function modifyBook(data: Book, form: FormData) {
   } else {
     return { error: "Nulla da modificare." };
   }
+
+  await deleteCsv();
+
   revalidatePath("/");
   revalidatePath("/admin");
   return { msg: "success" };

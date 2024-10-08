@@ -73,3 +73,14 @@ const callFileUp = async (countBooks: number) => {
   const data = await put(url, csvData, { access: "public" });
   return data;
 };
+
+export async function deleteCsv() {
+  const { blobs } = await list({
+    prefix: "data",
+  });
+  const csv = blobs.find((el) => el.pathname.includes("csv"));
+  if (blobs.length === 0 || !csv) {
+    return null;
+  }
+  await del(csv.url);
+}
