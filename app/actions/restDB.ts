@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcrypt";
 import { Book } from "@prisma/client";
 import _ from "lodash";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function postLoan(data: any) {
   const verify = await verifySession(false);
@@ -146,20 +147,26 @@ export async function modifyUser(formData: any) {
     "name" in formData ||
     formData.role
   ) {
-    const res = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        ...("password" in formData && { password: newPassword }),
-        ...("number" in formData && { number: formData.number }),
-        ...(formData.email && { email: formData.email }),
-        ...("name" in formData && { name: formData.name }),
-        ...(formData.role && {
-          role: formData.role,
-        }),
-      },
-    });
-    if (!res.id) {
-      return { error: "Errore dal server" };
+    try {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          ...("password" in formData && { password: newPassword }),
+          ...("number" in formData && { number: formData.number }),
+          ...(formData.email && { email: formData.email }),
+          ...("name" in formData && { name: formData.name }),
+          ...(formData.role && {
+            role: formData.role,
+          }),
+        },
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === "P2002") {
+          return { error: "C'è già un utente con questa email." };
+        }
+      }
+      return { error: "Errore: dal server" };
     }
   } else {
     return { error: "Nulla da modificare." };
@@ -205,7 +212,7 @@ export async function addUser(data: any) {
   const email = validatedFields.data.email;
 
   try {
-    const res = await prisma.user.create({
+    await prisma.user.create({
       data: {
         password,
         email,
@@ -214,11 +221,13 @@ export async function addUser(data: any) {
         role: data.role || "VIEWER",
       },
     });
-    if (!res.id) {
-      return { error: "Errore dal server." };
-    }
   } catch (err) {
-    return { error: "Errore dal server, prova a cambiare l'email." };
+    if (err instanceof PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return { error: "C'è già un utente con questa email." };
+      }
+    }
+    return { error: "Errore dal server." };
   }
 
   revalidatePath("/admin");
@@ -308,25 +317,30 @@ export async function modifyBook(data: Book, form: FormData) {
     "scompartoCase" in data ||
     "note" in data
   ) {
-    const res = await prisma.book.update({
-      where: { id: data.id },
-      data: {
-        ...(blob && { image: blob.url }),
-        ...("autore" in data && { autore: data.autore }),
-        ...("casaEditrice" in data && { casaEditrice: data.casaEditrice }),
-        ...(data.titolo && { titolo: data.titolo }),
-        ...("annoPubblicazione" in data && {
-          annoPubblicazione: data.annoPubblicazione,
-        }),
-        ...("scompartoCase" in data && { scompartoCase: data.scompartoCase }),
-        ...("note" in data && { note: data.note }),
-        ...(data.categoryId && {
-          category: { connect: { id: data.categoryId } },
-        }),
-      },
-    });
-
-    if (!res.id) {
+    try {
+      const res = await prisma.book.update({
+        where: { id: data.id },
+        data: {
+          ...(blob && { image: blob.url }),
+          ...("autore" in data && { autore: data.autore }),
+          ...("casaEditrice" in data && { casaEditrice: data.casaEditrice }),
+          ...(data.titolo && { titolo: data.titolo }),
+          ...("annoPubblicazione" in data && {
+            annoPubblicazione: data.annoPubblicazione,
+          }),
+          ...("scompartoCase" in data && { scompartoCase: data.scompartoCase }),
+          ...("note" in data && { note: data.note }),
+          ...(data.categoryId && {
+            category: { connect: { id: data.categoryId } },
+          }),
+        },
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === "P2002") {
+          return { error: "C'è già un libro con questo nome." };
+        }
+      }
       return { error: "Errore dal server." };
     }
   } else {
@@ -439,7 +453,12 @@ export async function addBook(data: Book, form: FormData) {
       return { error: "Errore dal server." };
     }
   } catch (err) {
-    return { error: "Dati non iseriti." };
+    if (err instanceof PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return { error: "C'è già un libro con questo titolo." };
+      }
+    }
+    return { error: "Errore dal server." };
   }
 
   revalidatePath("/");
@@ -460,6 +479,11 @@ export async function addCategory(name: string) {
   try {
     await prisma.category.create({ data: { name } });
   } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return { error: "C'è già una categoria con questo nome." };
+      }
+    }
     return { error: "Errore: dal server" };
   }
 
@@ -510,6 +534,11 @@ export async function modifyCat(id: number, name: string) {
   try {
     await prisma.category.update({ where: { id }, data: { name } });
   } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return { error: "C'è già una categoria con questo nome." };
+      }
+    }
     return { error: "Errore: dal server" };
   }
 

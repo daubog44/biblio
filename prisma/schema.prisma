@@ -13,7 +13,7 @@ datasource db {
 
 model Category {
   id    Int     @id @default(autoincrement())
-  name  String  @unique
+  name  String  @unique 
   books Book[]
 
   @@map("categories")
@@ -24,7 +24,7 @@ model Book {
   categoryId        Int
   category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   autore            String?
-  titolo            String
+  titolo            String   @unique
   casaEditrice      String?
   annoPubblicazione String?
   note              String?
