@@ -11,6 +11,7 @@ import CardBook from "./books/CardBook"
 import Pagination from "./Pagination"
 import Loading from "@/components/Loading";
 import React from "react"
+import { per_page_def } from "@/app/lib/utils"
 
 // Mock data for books and categories
 /*
@@ -31,7 +32,7 @@ export function BookSearchComponent({ books, count, totalPages, hasNextPage, has
   const [isPending, startTransition] = useTransition()
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? '1'
-  const per_page = searchParams.get('limit') ?? '8'
+  const per_page = searchParams.get('limit') ?? per_page_def;
   const prev_page = searchParams.get('prev_page');
   const category = searchParams.get('category');
   const query = searchParams.get('query');

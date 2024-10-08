@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { PrismaClient } from "@prisma/client";
 
+export const per_page_def = 8;
 const prismaClientSingleton = () => {
   return new PrismaClient();
 };

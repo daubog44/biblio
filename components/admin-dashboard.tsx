@@ -26,6 +26,7 @@ import { DeleteCat } from "./categories/DeleteCat"
 import Loading from "./Loading"
 import { downloadCsv } from "@/app/actions/utils"
 import Link from "next/link"
+import { per_page_def } from "@/app/lib/utils"
 
 
 type Books = Prisma.BookGetPayload<{ include: { category: true } }>[];
@@ -36,7 +37,7 @@ export function AdminDashboardComponent({ loans, books, users, categories, userC
   const router = useRouter()
   const searchParams = useSearchParams()
   const page = searchParams.get('page') ?? '1'
-  const per_page = searchParams.get('limit') ?? '8'
+  const per_page = searchParams.get('limit') ?? per_page_def;
   const section = searchParams.get('section') ?? "user";
   const query = searchParams.get('query');
   const [isPending, startTransition] = useTransition()

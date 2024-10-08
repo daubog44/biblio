@@ -2,7 +2,7 @@
 import { BookSearchComponent } from '@/components/book-search';
 import { booksGet, booksGetByCat, getAllCategories } from '@/app/lib/callDB';
 import { getUser } from '@/app/lib/dal'
-import prisma from '@/app/lib/utils';
+import prisma, { per_page_def } from '@/app/lib/utils';
 import { redirect } from "next/navigation";
 
 export default async function Home({
@@ -17,7 +17,7 @@ export default async function Home({
   }
 
   const page = searchParams['page'] ?? '1'
-  const per_page = searchParams['limit'] ?? '16'
+  const per_page = searchParams['limit'] ?? per_page_def;
   const category = searchParams['category'];
   const query = searchParams['query'];
   const start = (Number(page) - 1) * Number(per_page) // 0, 5, 10 ...
