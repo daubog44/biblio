@@ -30,6 +30,7 @@ async function main() {
   for (const category of Object.keys(data)) {
     const books = // @ts-ignore
       data[category]
+        .filter((el) => el.TITOLO)
         .map((book) => ({
           titolo: book.TITOLO,
           autore: book.AUTORE,
@@ -43,7 +44,7 @@ async function main() {
     await prisma.category.create({
       data: {
         name: category,
-        books: { createMany: { data: [...books] } },
+        books: { createMany: { data: [...books], skipDuplicates: true } },
       },
     });
   }

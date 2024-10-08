@@ -45,31 +45,37 @@ export function DialogAddBook({ categories, btnClasses }: { btnClasses?: string,
                             <Label htmlFor="titolo" className="text-right">
                                 Titolo
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, titolo: e.target.value.toLowerCase() })) }} id="titolo" name="titolo" placeholder="titolo necessario" className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, titolo: e.target.value })) }} id="titolo" name="titolo" placeholder="titolo necessario" className="col-span-3" />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="anno" className="text-right">
                                 anno
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, annoPubblicazione: e.target.value.toLowerCase() })) }} id="anno" name="anno" placeholder="inserisci anno" className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, annoPubblicazione: e.target.value })) }} id="anno" name="anno" placeholder="inserisci anno" className="col-span-3" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="autore" className="text-right">
+                                Autore
+                            </Label>
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, autore: e.target.value })) }} id="autore" name="autore" placeholder="inserisci autore" className="col-span-3" />
                         </div>
                         <div className="relative grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="casaEditrice" className="text-right">
                                 casa editrice
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, casaEditrice: e.target.value.toLowerCase() })) }} id="casaEditrice" name="casaEditrice" placeholder="titolo la casa editrice" className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, casaEditrice: e.target.value })) }} id="casaEditrice" name="casaEditrice" placeholder="titolo la casa editrice" className="col-span-3" />
                         </div>
                         <div className="relative grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="note" className="text-right">
                                 note
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, note: e.target.value.toLowerCase() })) }} id="note" name="note" placeholder="inserisci note" className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, note: e.target.value })) }} id="note" name="note" placeholder="inserisci note" className="col-span-3" />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="scompartoCase" className="text-right">
                                 scomparto
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, scompartoCase: e.target.value.toLowerCase() })) }} id="scompartoCase" name="scompartoCase" placeholder="inserisci scomparto" className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, scompartoCase: e.target.value })) }} id="scompartoCase" name="scompartoCase" placeholder="inserisci scomparto" className="col-span-3" />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="categoryId" className="text-right">

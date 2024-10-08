@@ -45,7 +45,13 @@ export function DialogModifyBook({ book, categories, btnClasses }: { btnClasses?
                             <Label htmlFor="titolo" className="text-right">
                                 Titolo
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, titolo: e.target.value.toLowerCase() })) }} id="titolo" name="titolo" defaultValue={book.titolo || ""} className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, titolo: e.target.value })) }} id="titolo" name="titolo" defaultValue={book.titolo || ""} className="col-span-3" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="autore" className="text-right">
+                                Autore
+                            </Label>
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, autore: e.target.value })) }} id="autore" name="autore" defaultValue={book.autore || ""} className="col-span-3" />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="anno" className="text-right">
@@ -57,7 +63,7 @@ export function DialogModifyBook({ book, categories, btnClasses }: { btnClasses?
                             <Label htmlFor="casaEditrice" className="text-right">
                                 casa editrice
                             </Label>
-                            <Input onChange={(e) => { setState((prev) => ({ ...prev, casaEditrice: e.target.value.toLowerCase() })) }} id="casaEditrice" name="casaEditrice" defaultValue={book.casaEditrice || ""} className="col-span-3" />
+                            <Input onChange={(e) => { setState((prev) => ({ ...prev, casaEditrice: e.target.value })) }} id="casaEditrice" name="casaEditrice" defaultValue={book.casaEditrice || ""} className="col-span-3" />
                         </div>
                         <div className="relative grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="note" className="text-right">

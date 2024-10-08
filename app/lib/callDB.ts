@@ -22,11 +22,11 @@ export const booksGet = cache(async (start: number, per_page: number) => {
 export const getAllBooks = cache(async (count: number) => {
   const limit = 1000;
   let page = 1;
-  const skip = (page - 1) * limit;
 
   const totalPages = Math.ceil(count / limit);
   const books = [];
   while (page <= totalPages) {
+    const skip = (page - 1) * limit;
     const b = await prisma.book.findMany({
       include: { category: true },
       skip: skip,

@@ -60,7 +60,7 @@ const generateCsvBuffer = async (
 const callFileUp = async (countBooks: number) => {
   const url = "/data/csv" + countBooks + ".csv";
   const allBooks = (await getAllBooks(countBooks)).map((el, row) => ({
-    ID: row,
+    ID: row + 1,
     CATEGORIA: el.category.name,
     TITOLO: el.titolo,
     AUTORE: el.autore,

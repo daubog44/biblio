@@ -439,7 +439,7 @@ export async function addBook(data: Book, form: FormData) {
       return { error: "Errore dal server." };
     }
   } catch (err) {
-    return { error: "Nulla da modificare." };
+    return { error: "Dati non iseriti." };
   }
 
   revalidatePath("/");
